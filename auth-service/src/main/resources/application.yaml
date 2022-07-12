@@ -1,5 +1,8 @@
 server:
   port: 9096
+spring:
+  application:
+    name: Zuul-gateway
 
 eureka:
   instance:
