@@ -1,4 +1,4 @@
-package io.pelt.hlam.auth;
+package io.pelt.hlam.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,9 +10,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableEurekaClient
 @EnableZuulProxy
 @EnableFeignClients
-public class AuthService {
+public class Gateway {
 	public static void main(String[] args) {
-		SpringApplication.run(AuthService.class, args);
+		SpringApplication.run(Gateway.class, args);
 	}
 
 }

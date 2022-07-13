@@ -1,16 +1,8 @@
 server:
-  port: 9002
+  port: 9096
 spring:
   application:
-    name: Auth-service
-  datasource:
-    driver-class-name:
-    username: postgres
-    password: password
-    url: jdbc:postgresql://localhost:5432/auth-service
-  jpa:
-    hibernate:
-      ddl-auto: create
+    name: Zuul-gateway
 
 eureka:
   instance:
