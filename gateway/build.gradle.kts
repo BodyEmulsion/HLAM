@@ -14,10 +14,9 @@ repositories {
 extra["springCloudVersion"] = "2021.0.3"
 
 dependencies {
-	implementation("org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.10.RELEASE")
-	implementation("org.springframework.cloud:spring-cloud-starter-openfeign:3.1.3")
+	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
