@@ -18,4 +18,9 @@ public class Privilege {
     private String name;
     @ManyToMany(mappedBy = "privileges")
     private Collection<Role> roles;
+
+    @Override
+    public String toString(){
+        return id.toString() + ":" + name;
+    }
 }
