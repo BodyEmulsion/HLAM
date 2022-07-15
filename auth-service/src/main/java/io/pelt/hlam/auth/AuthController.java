@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.interfaces.RSAPublicKey;
+
 
 @RestController
 public class AuthController {
@@ -37,5 +39,10 @@ public class AuthController {
             return new ResponseEntity<>("invalid JWT", HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "get-public-key")
+    public ResponseEntity<RSAPublicKey> getPublicKey(){
+        return new ResponseEntity<>(this.authService.getPublicKey(), HttpStatus.OK);
     }
 }
