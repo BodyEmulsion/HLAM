@@ -1,15 +1,16 @@
 package io.pelt.hlam.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 
 
 @RestController
@@ -29,20 +30,26 @@ public class AuthController {
 
     }
 
-    @GetMapping(path = "validate") //TODO: Move to gateway and add some validation
-    public ResponseEntity<String> validateJWT(@RequestHeader("jwt") String jwt){
-        var algorithm = Algorithm.RSA512(this.authService.getPublicKey(), null);
-        JWTVerifier verifier = JWT.require(algorithm).build();
-        try {
-            verifier.verify(jwt);
-        } catch (JWTVerificationException e) {
-            return new ResponseEntity<>("invalid JWT", HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @GetMapping(path = "validate") //TODO: Move to gateway and add some validation
+//    public ResponseEntity<String> validateJWT(@RequestHeader("jwt") String jwt){
+//        var algorithm = Algorithm.RSA512(this.authService.getPublicKey(), null);
+//        JWTVerifier verifier = JWT.require(algorithm).build();
+//        try {
+//            verifier.verify(jwt);
+//        } catch (JWTVerificationException e) {
+//            return new ResponseEntity<>("invalid JWT", HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
     @GetMapping(path = "get-public-key")
-    public ResponseEntity<RSAPublicKey> getPublicKey(){
-        return new ResponseEntity<>(this.authService.getPublicKey(), HttpStatus.OK);
+    public ResponseEntity<X509EncodedKeySpec> getPublicKey(){
+        try {
+            return new ResponseEntity<>(this.authService.getPublicKey(), HttpStatus.OK);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

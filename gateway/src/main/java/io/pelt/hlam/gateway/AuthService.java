@@ -1,12 +1,13 @@
 package io.pelt.hlam.gateway;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
 
-@FeignClient(name = "auth-service", url = "lb://auth-service")
+@FeignClient("auth-service")
 public interface AuthService {
     @GetMapping(path = "/get-public-key")
-    RSAPublicKey getPublicKey();
+    ResponseEntity<X509EncodedKeySpec> getPublicKey();
 }

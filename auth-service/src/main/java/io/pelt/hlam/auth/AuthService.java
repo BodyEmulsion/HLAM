@@ -13,6 +13,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,8 +49,8 @@ public class AuthService {
         return generateJWT(user.get());
     }
 
-    public RSAPublicKey getPublicKey(){
-        return this.publicKey;
+    public X509EncodedKeySpec getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        return new X509EncodedKeySpec(publicKey.getEncoded());
     }
 
     private String generateJWT(User user) {
