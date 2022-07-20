@@ -13,12 +13,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,11 +45,22 @@ public class AuthService {
         return generateJWT(user.get());
     }
 
-    public X509EncodedKeySpec getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return new X509EncodedKeySpec(publicKey.getEncoded());
+    public RSAPublicKeySpec getPublicKey() {
+        return new RSAPublicKeySpec(publicKey.getModulus(), publicKey.getPublicExponent());
     }
 
     private String generateJWT(User user) {
+        Map<String, String> tokenData = getClaimsMap(user);
+        var calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, 1);
+        Algorithm algorithm = Algorithm.RSA512(null, privateKey);
+        return JWT.create()
+                .withPayload(tokenData)
+                .withExpiresAt(calendar.getTime())
+                .sign(algorithm);
+    }
+
+    private Map<String, String> getClaimsMap(User user) {
         var tokenData = new HashMap<String, String>();
         tokenData.put("username", user.getUsername());
         tokenData.put("roles", user.getRoles().toString());
@@ -65,13 +72,6 @@ public class AuthService {
         );
         tokenData.put("id", user.getId().toString());
         tokenData.put("create_time", String.valueOf(new Date().getTime()));
-        var calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, 1);
-        tokenData.put("expiration_date", String.valueOf(calendar.getTime()));
-        Algorithm algorithm = Algorithm.RSA512(null, privateKey);
-        return JWT.create()
-                .withPayload(tokenData)
-                .withExpiresAt(calendar.getTime())
-                .sign(algorithm);
+        return tokenData;
     }
 }

@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.math.BigInteger;
+import java.util.Map;
 
 
-@RestController
+@RestController()
 public class AuthController {
     @Autowired
     private AuthService authService;
@@ -30,26 +30,13 @@ public class AuthController {
 
     }
 
-//    @GetMapping(path = "validate") //TODO: Move to gateway and add some validation
-//    public ResponseEntity<String> validateJWT(@RequestHeader("jwt") String jwt){
-//        var algorithm = Algorithm.RSA512(this.authService.getPublicKey(), null);
-//        JWTVerifier verifier = JWT.require(algorithm).build();
-//        try {
-//            verifier.verify(jwt);
-//        } catch (JWTVerificationException e) {
-//            return new ResponseEntity<>("invalid JWT", HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
     @GetMapping(path = "get-public-key")
-    public ResponseEntity<X509EncodedKeySpec> getPublicKey(){
+    public Mono<Map<String, BigInteger>> getPublicKey(){
         try {
-            return new ResponseEntity<>(this.authService.getPublicKey(), HttpStatus.OK);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeySpecException e) {
-            throw new RuntimeException(e);
+            var spec = this.authService.getPublicKey();
+            return Mono.just(Map.of("modulus", spec.getModulus(), "exp", spec.getPublicExponent()));
+        } catch (Exception e) {
+           return Mono.error(e);
         }
     }
 }

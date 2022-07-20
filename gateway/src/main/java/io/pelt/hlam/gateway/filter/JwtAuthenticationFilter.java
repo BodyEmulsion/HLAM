@@ -1,6 +1,7 @@
 package io.pelt.hlam.gateway.filter;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
@@ -12,42 +13,42 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
 import java.util.function.Predicate;
 
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
     private final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-
-    @Lazy
-
     @Autowired
+    @Lazy
     private AuthService authService;
 
-    private CompletableFuture<ResponseEntity<X509EncodedKeySpec>> publicKey;
+    private JWTVerifier verifier;
+    private Mono<Map<String, BigInteger>> publicKeyRequest;
 
-    JwtAuthenticationFilter(){
+    JwtAuthenticationFilter() {
         super();
     }
 
     @Override
     public GatewayFilter apply(Object config) {
         return (exchange, chain) -> {
-            this.logger.info("In JwtAuthenticationFilter");
+            if (this.publicKeyRequest == null) {
+                requestPublicKey();
+            }
             ServerHttpRequest request = exchange.getRequest();
             final List<String> apiEndpoints = List.of("auth-service/login");
             //TODO: move unsecured api to configration(?)
@@ -63,62 +64,72 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
         };
     }
 
+    private void requestPublicKey(){
+        this.publicKeyRequest = this.authService.getPublicKey();
+        this.publicKeyRequest.subscribe(
+                rsaPublicKeySpec -> {
+                    try {
+                        this.verifier = getJwtVerifier(rsaPublicKeySpec);
+                        //TODO: come up with exceptions
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvalidKeySpecException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                error -> {
+                    logger.error("Request public key error", error);
+                    this.publicKeyRequest = null;
+                });
+    }
+
+    private JWTVerifier getJwtVerifier(Map<String, BigInteger> rsaPublicKeySpec)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        var publicKeySpec = new RSAPublicKeySpec(
+                rsaPublicKeySpec.get("modulus"),
+                rsaPublicKeySpec.get("exp"));
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
+        var algorithm = Algorithm.RSA512(publicKey, null);
+        return JWT.require(algorithm).build();
+    }
+
     private Mono<Void> validate(ServerWebExchange exchange, ServerHttpRequest request) {
-        if (!request.getHeaders().containsKey("jwt")) {
-            ServerHttpResponse response = exchange.getResponse();
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            return response.setComplete();
-        }
+        if (!request.getHeaders().containsKey("jwt"))
+            return getJWTNotPresentResponse(exchange);
+        if (this.verifier == null)
+            return getJWTVerifierNotPresentResponse(exchange);
+
         final String jwt = request.getHeaders().getOrEmpty("jwt").get(0);
-        if (this.publicKey == null){
-            this.publicKey =
-                    CompletableFuture.supplyAsync(() -> this.authService.getPublicKey()).exceptionally(ex -> {
-                        ex.printStackTrace();
-                        throw new RuntimeException();
-                    });
-        }
-        if (!this.publicKey.isDone()) {
-            ServerHttpResponse response = exchange.getResponse();
-            response.setStatusCode(HttpStatus.I_AM_A_TEAPOT);
-            return response.setComplete();
-        } else if (this.publicKey.isCompletedExceptionally()){
-            logger.info("Exceptionally");
-            this.publicKey =
-                    CompletableFuture.supplyAsync(() -> this.authService.getPublicKey()).exceptionally(ex -> {
-                        ex.printStackTrace();
-                        throw new RuntimeException();
-                    });
-            ServerHttpResponse response = exchange.getResponse();
-            response.setStatusCode(HttpStatus.I_AM_A_TEAPOT);
-            return response.setComplete();
-        } else {
-            try {
-                X509EncodedKeySpec keySpec = this.publicKey.get().getBody();
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                RSAPublicKey pubKey = (RSAPublicKey) keyFactory.generatePublic(keySpec);
-
-
-                var algorithm = Algorithm.RSA512(pubKey, null);
-                var verifier = JWT.require(algorithm).build();
-                //TODO: try to make verifier singleton, after buing fire estinguisher
-                var decoded = verifier.verify(jwt);
-                decoded.getClaims().forEach((String key, Claim claim) ->
-                        exchange.getRequest().mutate().header("jwt-" + key, String.valueOf(claim)).build());
-            } catch (JWTVerificationException e) {
-                //TODO: Add information about verification error
-                ServerHttpResponse response = exchange.getResponse();
-                response.setStatusCode(HttpStatus.BAD_REQUEST);
-                return response.setComplete();
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidKeySpecException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            var decoded = this.verifier.verify(jwt);
+            decoded.getClaims().forEach((String key, Claim claim) ->
+                    exchange.getRequest().mutate().header("jwt-" + key, String.valueOf(claim)).build());
+            exchange.getRequest().mutate().header("jwt", (String) null);
+        } catch (JWTVerificationException error) {
+            return getJWTVerificationErrorResponse(exchange, error);
         }
         return null;
+    }
+
+    private Mono<Void> getJWTVerificationErrorResponse(ServerWebExchange exchange, JWTVerificationException e) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.BAD_REQUEST);
+        response.getHeaders().add("error-message", e.getMessage());
+        //TODO: come up with something better
+        return response.setComplete();
+    }
+
+    private Mono<Void> getJWTVerifierNotPresentResponse(ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.SERVICE_UNAVAILABLE);
+        response.getHeaders().add("Retry-After", "30");
+        return response.setComplete();
+    }
+
+    private Mono<Void> getJWTNotPresentResponse(ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return response.setComplete();
     }
 }

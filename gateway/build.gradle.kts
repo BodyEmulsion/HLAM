@@ -15,7 +15,7 @@ extra["springCloudVersion"] = "2021.0.3"
 
 dependencies {
 	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
-	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+	implementation("com.playtika.reactivefeign:feign-reactor-spring-cloud-starter:3.2.3")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

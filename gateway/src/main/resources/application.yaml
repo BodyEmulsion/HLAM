@@ -2,26 +2,27 @@ server:
   port: 9096
 spring:
   application:
-    name: Gateway
+    name: gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: 'true'
-          lower-case-service-id: 'true'
       routes:
-        - id: auth
+        - id: auth-service-login
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
-        - id: weather
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /$\{segment}
+        - id: gateway-actuator
+          uri: lb://gateway
+          predicates:
+            - Path=actuator/**
+        - id: weather-service
           uri: lb://weather-service
           predicates:
             - Path=/weather/**
           filters:
             - JwtAuthenticationFilter
-  aop:
-    proxy-target-class: true
+            - RewritePath=/weather/(?<segment>.*), /$\{segment}
 
 eureka:
   instance:
@@ -33,7 +34,7 @@ eureka:
     defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
 
 management:
-  endpoint:
+  endpoints:
     web:
       exposure:
         include: "*"
