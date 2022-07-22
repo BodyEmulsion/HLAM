@@ -28,22 +28,32 @@ public class Initializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
-        var privilege = Privilege.builder()
-                .name("TestPrivilege")
+        var mirror = Privilege.builder()
+                .name("mirror")
+                .build();
+        var actuator = Privilege.builder()
+                .name("actuator")
+                .build();
+        var publicKey = Privilege.builder()
+                .name("public-key")
                 .build();
         var role = Role.builder()
-                .name("TestRole")
+                .name("admin")
                 .build();
         var user = User.builder()
-                .username("user")
+                .username("admin")
                 .password(passwordEncoder.encode("password"))
                 .build();
 
-        privilege.setRoles(List.of(role));
-        role.setPrivileges(List.of(privilege));
+        mirror.setRoles(List.of(role));
+        actuator.setRoles(List.of(role));
+        publicKey.setRoles(List.of(role));
+        role.setPrivileges(List.of(mirror, actuator, publicKey));
         user.setRoles(List.of(role));
 
-        privilegeRepository.save(privilege);
+        privilegeRepository.save(mirror);
+        privilegeRepository.save(actuator);
+        privilegeRepository.save(publicKey);
         roleRepository.save(role);
         userRepository.save(user);
     }

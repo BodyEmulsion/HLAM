@@ -21,6 +21,6 @@ public class Privilege {
 
     @Override
     public String toString(){
-        return id.toString() + ":" + name;
+        return name;
     }
 }

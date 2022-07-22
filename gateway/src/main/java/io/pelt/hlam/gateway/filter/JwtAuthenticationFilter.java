@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
 
     @Override
     public GatewayFilter apply(Object config) {
-        return (exchange, chain) -> {
+        return new OrderedGatewayFilter((exchange, chain) -> {
             if (this.publicKeyRequest == null) {
                 requestPublicKey();
             }
@@ -61,7 +62,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
                 if (response != null) return response;
             }
             return chain.filter(exchange);
-        };
+        }, 0);
     }
 
     private void requestPublicKey(){

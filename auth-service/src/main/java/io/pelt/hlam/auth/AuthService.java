@@ -2,6 +2,7 @@ package io.pelt.hlam.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import io.pelt.hlam.auth.model.Privilege;
 import io.pelt.hlam.auth.model.Role;
 import io.pelt.hlam.auth.model.User;
 import io.pelt.hlam.auth.repository.UserRepository;
@@ -14,7 +15,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.*;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +54,7 @@ public class AuthService {
     }
 
     private String generateJWT(User user) {
-        Map<String, String> tokenData = getClaimsMap(user);
+        Map<String, Object> tokenData = getClaimsMap(user);
         var calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 1);
         Algorithm algorithm = Algorithm.RSA512(null, privateKey);
@@ -60,18 +64,18 @@ public class AuthService {
                 .sign(algorithm);
     }
 
-    private Map<String, String> getClaimsMap(User user) {
-        var tokenData = new HashMap<String, String>();
+    private Map<String, Object> getClaimsMap(User user) {
+        var tokenData = new HashMap<String, Object>();
+        tokenData.put("id", user.getId().toString());
         tokenData.put("username", user.getUsername());
-        tokenData.put("roles", user.getRoles().toString());
+        tokenData.put("roles", user.getRoles().stream().map(Role::toString).collect(Collectors.toList()));
         tokenData.put("privileges",
                 user.getRoles().stream()
                         .flatMap((Role r) -> r.getPrivileges().stream())
+                        .map(Privilege::toString)
                         .distinct()
-                        .collect(Collectors.toList()).toString()
+                        .collect(Collectors.toList())
         );
-        tokenData.put("id", user.getId().toString());
-        tokenData.put("create_time", String.valueOf(new Date().getTime()));
         return tokenData;
     }
 }

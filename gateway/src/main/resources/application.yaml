@@ -6,22 +6,41 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: auth-service-login
+        - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/auth/**
+            - Path=/auth/login, /auth/registration, /auth/guest-login
           filters:
             - RewritePath=/auth/(?<segment>.*), /$\{segment}
         - id: gateway-actuator
           uri: lb://gateway
           predicates:
             - Path=actuator/**
-        - id: weather-service
-          uri: lb://weather-service
-          predicates:
-            - Path=/weather/**
           filters:
             - JwtAuthenticationFilter
+            - PrivilegeCheckFilter=actuator
+        - id: weather-service-mirror
+          uri: lb://weather-service
+          predicates:
+            - Path=/weather/mirror
+          filters:
+            - JwtAuthenticationFilter
+            - PrivilegeCheckFilter=mirror
+            - RewritePath=/weather/(?<segment>.*), /$\{segment}
+        - id: weather-service-hello
+          uri: lb://weather-service
+          predicates:
+            - Path=/weather/hello
+          filters:
+            - JwtAuthenticationFilter
+            - RewritePath=/weather/(?<segment>.*), /$\{segment}
+        - id: weather-service-hello
+          uri: lb://weather-service
+          predicates:
+            - Path=/weather/privilege
+          filters:
+            - JwtAuthenticationFilter
+            - PrivilegeCheckFilter=privilege
             - RewritePath=/weather/(?<segment>.*), /$\{segment}
 
 eureka:
