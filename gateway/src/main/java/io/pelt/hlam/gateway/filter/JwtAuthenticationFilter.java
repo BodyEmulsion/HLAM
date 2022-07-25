@@ -71,11 +71,10 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
                 rsaPublicKeySpec -> {
                     try {
                         this.verifier = getJwtVerifier(rsaPublicKeySpec);
-                        //TODO: come up with exceptions
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new RuntimeException(e);
-                    } catch (InvalidKeySpecException e) {
-                        throw new RuntimeException(e);
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                        logger.error(e.getMessage());
+                        //TODO: do something with this.
+                        // those exceptions indicate that something is wrong with the auth service or this class, or both
                     }
                 },
                 error -> {
