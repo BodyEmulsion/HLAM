@@ -31,7 +31,7 @@ public class PrivilegeCheckFilter extends AbstractGatewayFilterFactory<Privilege
                                     .split(","))
                             .map(str -> str.trim().substring(1, str.length() - 1))
                             .collect(Collectors.toList());
-            if(jwtPrivileges.contains(config.getPrivilege())) {
+            if(!jwtPrivileges.contains(config.getPrivilege())) {
                 var response = exchange.getResponse();
                 response.setStatusCode(HttpStatus.FORBIDDEN);
                 response.getHeaders().add("error-message", "JWT doesn't contain required privilege");
