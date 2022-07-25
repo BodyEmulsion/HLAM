@@ -26,9 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
@@ -47,20 +45,11 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
     @Override
     public GatewayFilter apply(Object config) {
         return new OrderedGatewayFilter((exchange, chain) -> {
-            if (this.publicKeyRequest == null) {
+            if (this.publicKeyRequest == null)
                 requestPublicKey();
-            }
-            ServerHttpRequest request = exchange.getRequest();
-            final List<String> apiEndpoints = List.of("auth-service/login");
-            //TODO: move unsecured api to configration(?)
-
-            Predicate<ServerHttpRequest> isApiSecured = r -> apiEndpoints.stream()
-                    .noneMatch(uri -> r.getURI().getPath().contains(uri));
-
-            if (isApiSecured.test(request)) {
-                Mono<Void> response = validate(exchange, request);
-                if (response != null) return response;
-            }
+            Mono<Void> response = validate(exchange);
+            if (response != null)
+                return response;
             return chain.filter(exchange);
         }, 0);
     }
@@ -94,7 +83,8 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
         return JWT.require(algorithm).build();
     }
 
-    private Mono<Void> validate(ServerWebExchange exchange, ServerHttpRequest request) {
+    private Mono<Void> validate(ServerWebExchange exchange) {
+        ServerHttpRequest request = exchange.getRequest();
         if (!request.getHeaders().containsKey("jwt"))
             return getJWTNotPresentResponse(exchange);
         if (this.verifier == null)
