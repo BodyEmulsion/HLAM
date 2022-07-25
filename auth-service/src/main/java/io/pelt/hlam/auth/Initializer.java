@@ -44,7 +44,10 @@ public class Initializer {
                 .username("admin")
                 .password(passwordEncoder.encode("password"))
                 .build();
-
+        var guest = Role.builder()
+                .name("guest")
+                .privileges(List.of(mirror))
+                .build();
         mirror.setRoles(List.of(role));
         actuator.setRoles(List.of(role));
         publicKey.setRoles(List.of(role));
@@ -55,6 +58,7 @@ public class Initializer {
         privilegeRepository.save(actuator);
         privilegeRepository.save(publicKey);
         roleRepository.save(role);
+        roleRepository.save(guest);
         userRepository.save(user);
     }
 }

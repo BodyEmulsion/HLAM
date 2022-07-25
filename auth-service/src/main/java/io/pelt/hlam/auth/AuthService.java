@@ -2,9 +2,11 @@ package io.pelt.hlam.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import io.pelt.hlam.auth.enums.DefaultRole;
 import io.pelt.hlam.auth.model.Privilege;
 import io.pelt.hlam.auth.model.Role;
 import io.pelt.hlam.auth.model.User;
+import io.pelt.hlam.auth.repository.RoleRepository;
 import io.pelt.hlam.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,10 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +26,8 @@ public class AuthService {
     private final RSAPublicKey publicKey;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -77,5 +78,17 @@ public class AuthService {
                         .collect(Collectors.toList())
         );
         return tokenData;
+    }
+
+    public String getGuestJWT() throws DatabaseDefaultValueException {
+        Optional<Role> role = roleRepository.findById(DefaultRole.GUEST.getId());
+        if(role.isEmpty()){
+            throw new DatabaseDefaultValueException("DB doesn't contain a default role");
+        }
+        User guest = User.builder()
+                .roles(List.of(role.get()))
+                .build();
+        guest = this.userRepository.save(guest);
+        return generateJWT(guest);
     }
 }

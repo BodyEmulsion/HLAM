@@ -39,4 +39,14 @@ public class AuthController {
            return Mono.error(e);
         }
     }
+
+    @PostMapping(path = "guest-login")
+    public ResponseEntity<String> getGuestJWT(){
+        try {
+            return new ResponseEntity<>(this.authService.getGuestJWT(), HttpStatus.OK);
+        } catch (DatabaseDefaultValueException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
