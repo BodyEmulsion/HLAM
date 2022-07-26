@@ -1,5 +1,8 @@
 package io.pelt.hlam.auth;
 
+import io.pelt.hlam.auth.exceptions.DatabaseDefaultValueException;
+import io.pelt.hlam.auth.exceptions.UserNotFoundException;
+import io.pelt.hlam.auth.exceptions.WrongPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
