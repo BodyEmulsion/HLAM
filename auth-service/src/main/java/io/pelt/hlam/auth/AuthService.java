@@ -86,12 +86,28 @@ public class AuthService {
     public String getGuestJWT() throws DatabaseDefaultValueException {
         Optional<Role> role = roleRepository.findById(DefaultRole.GUEST.getId());
         if(role.isEmpty()){
-            throw new DatabaseDefaultValueException("DB doesn't contain a default role");
+            throw new DatabaseDefaultValueException("DB doesn't contain the User role");
         }
         User guest = User.builder()
                 .roles(List.of(role.get()))
                 .build();
         guest = this.userRepository.save(guest);
         return generateJWT(guest);
+    }
+
+    public String register(String email, String password, String username) throws DatabaseDefaultValueException {
+        //TODO: add some validations and email verification
+        Optional<Role> role = roleRepository.findById(DefaultRole.USER.getId());
+        if (role.isEmpty()){
+            throw new DatabaseDefaultValueException("DB doesn't contain the User role");
+        }
+        User user = User.builder()
+                .username(username)
+                .password(password)
+                .email(email)
+                .roles(List.of(role.get()))
+                .build();
+        user = userRepository.save(user);
+        return generateJWT(user);
     }
 }

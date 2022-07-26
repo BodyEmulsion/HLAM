@@ -9,7 +9,7 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/auth/login, /auth/registration, /auth/guest-login
+            - Path=/auth/login, /auth/registration, /auth/guest-login, /auth/register
           filters:
             - RewritePath=/auth/(?<segment>.*), /$\{segment}
         - id: gateway-actuator

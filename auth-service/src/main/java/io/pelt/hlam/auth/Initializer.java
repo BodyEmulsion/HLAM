@@ -37,28 +37,33 @@ public class Initializer {
         var publicKey = Privilege.builder()
                 .name("public-key")
                 .build();
-        var role = Role.builder()
+        var adminRole = Role.builder()
                 .name("admin")
                 .build();
-        var user = User.builder()
+        var adminUser = User.builder()
                 .username("admin")
                 .password(passwordEncoder.encode("password"))
                 .build();
-        var guest = Role.builder()
+        var guestRole = Role.builder()
                 .name("guest")
                 .privileges(List.of(mirror))
                 .build();
-        mirror.setRoles(List.of(role));
-        actuator.setRoles(List.of(role));
-        publicKey.setRoles(List.of(role));
-        role.setPrivileges(List.of(mirror, actuator, publicKey));
-        user.setRoles(List.of(role));
+        var userRole = Role.builder()
+                .name("user")
+                .privileges(List.of(mirror))
+                .build();
+        mirror.setRoles(List.of(adminRole));
+        actuator.setRoles(List.of(adminRole));
+        publicKey.setRoles(List.of(adminRole));
+        adminRole.setPrivileges(List.of(mirror, actuator, publicKey));
+        adminUser.setRoles(List.of(adminRole));
 
         privilegeRepository.save(mirror);
         privilegeRepository.save(actuator);
         privilegeRepository.save(publicKey);
-        roleRepository.save(role);
-        roleRepository.save(guest);
-        userRepository.save(user);
+        roleRepository.save(adminRole);
+        roleRepository.save(guestRole);
+        roleRepository.save(userRole);
+        userRepository.save(adminUser);
     }
 }

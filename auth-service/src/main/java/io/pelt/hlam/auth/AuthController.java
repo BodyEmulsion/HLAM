@@ -52,4 +52,14 @@ public class AuthController {
         }
     }
 
+    @PostMapping(path = "register")
+    public ResponseEntity<String> register(@RequestParam("email") String email,
+                                           @RequestParam("password") String password,
+                                           @RequestParam("username") String username){
+        try {
+            return new ResponseEntity<>(authService.register(email, password, username), HttpStatus.OK);
+        } catch (DatabaseDefaultValueException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
