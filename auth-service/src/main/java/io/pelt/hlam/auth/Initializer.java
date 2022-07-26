@@ -12,8 +12,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class Initializer {
     @Autowired
@@ -40,23 +38,23 @@ public class Initializer {
         var adminRole = Role.builder()
                 .name("admin")
                 .build();
+        var guestRole = Role.builder()
+                .name("guest")
+                .build();
+        var userRole = Role.builder()
+                .name("user")
+                .build();
         var adminUser = User.builder()
                 .username("admin")
                 .password(passwordEncoder.encode("password"))
                 .build();
-        var guestRole = Role.builder()
-                .name("guest")
-                .privileges(List.of(mirror))
-                .build();
-        var userRole = Role.builder()
-                .name("user")
-                .privileges(List.of(mirror))
-                .build();
-        mirror.setRoles(List.of(adminRole));
-        actuator.setRoles(List.of(adminRole));
-        publicKey.setRoles(List.of(adminRole));
-        adminRole.setPrivileges(List.of(mirror, actuator, publicKey));
-        adminUser.setRoles(List.of(adminRole));
+        adminRole
+                .addPrivilege(mirror)
+                .addPrivilege(actuator)
+                .addPrivilege(publicKey);
+        guestRole.addPrivilege(mirror);
+        userRole.addPrivilege(mirror);
+        adminUser.addRole(adminRole);
 
         privilegeRepository.save(mirror);
         privilegeRepository.save(actuator);

@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 
 @Setter
 @Getter
@@ -30,5 +31,15 @@ public class Role {
     @Override
     public String toString(){
         return id.toString() + ":" + name;
+    }
+
+    public Role addPrivilege(Privilege privilege){
+        if (this.privileges == null)
+            this.privileges = new HashSet<>();
+        this.privileges.add(privilege);
+        if (privilege.getRoles() == null)
+            privilege.setRoles(new HashSet<>());
+        privilege.getRoles().add(this);
+        return this;
     }
 }
