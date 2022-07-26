@@ -1,4 +1,4 @@
-package io.pelt.hlam.auth.model;
+package io.pelt.hlam.auth.entity;
 
 import lombok.*;
 

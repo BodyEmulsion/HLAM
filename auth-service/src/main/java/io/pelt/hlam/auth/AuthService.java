@@ -2,13 +2,14 @@ package io.pelt.hlam.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import io.pelt.hlam.auth.entity.Privilege;
+import io.pelt.hlam.auth.entity.Role;
+import io.pelt.hlam.auth.entity.User;
 import io.pelt.hlam.auth.enums.DefaultRole;
 import io.pelt.hlam.auth.exceptions.DatabaseDefaultValueException;
 import io.pelt.hlam.auth.exceptions.UserNotFoundException;
 import io.pelt.hlam.auth.exceptions.WrongPasswordException;
-import io.pelt.hlam.auth.model.Privilege;
-import io.pelt.hlam.auth.model.Role;
-import io.pelt.hlam.auth.model.User;
+import io.pelt.hlam.auth.model.RegistrationUserDto;
 import io.pelt.hlam.auth.repository.RoleRepository;
 import io.pelt.hlam.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,16 +96,15 @@ public class AuthService {
         return generateJWT(guest);
     }
 
-    public String register(String email, String password, String username) throws DatabaseDefaultValueException {
-        //TODO: add some validations and email verification
+    public String register(RegistrationUserDto userDto) throws DatabaseDefaultValueException {
         Optional<Role> role = roleRepository.findById(DefaultRole.USER.getId());
         if (role.isEmpty()){
             throw new DatabaseDefaultValueException("DB doesn't contain the User role");
         }
         User user = User.builder()
-                .username(username)
-                .password(password)
-                .email(email)
+                .username(userDto.getUsername())
+                .password(passwordEncoder.encode(userDto.getPassword()))
+                .email(userDto.getEmail())
                 .roles(List.of(role.get()))
                 .build();
         user = userRepository.save(user);

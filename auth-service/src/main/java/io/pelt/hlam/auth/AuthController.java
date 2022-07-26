@@ -3,6 +3,7 @@ package io.pelt.hlam.auth;
 import io.pelt.hlam.auth.exceptions.DatabaseDefaultValueException;
 import io.pelt.hlam.auth.exceptions.UserNotFoundException;
 import io.pelt.hlam.auth.exceptions.WrongPasswordException;
+import io.pelt.hlam.auth.model.RegistrationUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -53,11 +55,9 @@ public class AuthController {
     }
 
     @PostMapping(path = "register")
-    public ResponseEntity<String> register(@RequestParam("email") String email,
-                                           @RequestParam("password") String password,
-                                           @RequestParam("username") String username){
+    public ResponseEntity<String> register(@Valid RegistrationUserDto userDto){
         try {
-            return new ResponseEntity<>(authService.register(email, password, username), HttpStatus.OK);
+            return new ResponseEntity<>(authService.register(userDto), HttpStatus.OK);
         } catch (DatabaseDefaultValueException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -1,8 +1,8 @@
 package io.pelt.hlam.auth;
 
-import io.pelt.hlam.auth.model.Privilege;
-import io.pelt.hlam.auth.model.Role;
-import io.pelt.hlam.auth.model.User;
+import io.pelt.hlam.auth.entity.Privilege;
+import io.pelt.hlam.auth.entity.Role;
+import io.pelt.hlam.auth.entity.User;
 import io.pelt.hlam.auth.repository.PrivilegeRepository;
 import io.pelt.hlam.auth.repository.RoleRepository;
 import io.pelt.hlam.auth.repository.UserRepository;

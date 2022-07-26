@@ -1,6 +1,6 @@
 package io.pelt.hlam.auth.repository;
 
-import io.pelt.hlam.auth.model.User;
+import io.pelt.hlam.auth.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
