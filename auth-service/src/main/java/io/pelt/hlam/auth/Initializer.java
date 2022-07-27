@@ -1,11 +1,11 @@
 package io.pelt.hlam.auth;
 
 import io.pelt.hlam.auth.entity.Privilege;
+import io.pelt.hlam.auth.entity.RegisteredUser;
 import io.pelt.hlam.auth.entity.Role;
-import io.pelt.hlam.auth.entity.User;
 import io.pelt.hlam.auth.repository.PrivilegeRepository;
+import io.pelt.hlam.auth.repository.RegisteredUserRepository;
 import io.pelt.hlam.auth.repository.RoleRepository;
-import io.pelt.hlam.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Initializer {
     @Autowired
-    private UserRepository userRepository;
+    private RegisteredUserRepository registeredUserRepository;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
@@ -44,7 +44,7 @@ public class Initializer {
         var userRole = Role.builder()
                 .name("user")
                 .build();
-        var adminUser = User.builder()
+        var adminUser = RegisteredUser.builder()
                 .username("admin")
                 .password(passwordEncoder.encode("password"))
                 .build();
@@ -62,6 +62,6 @@ public class Initializer {
         roleRepository.save(adminRole);
         roleRepository.save(guestRole);
         roleRepository.save(userRole);
-        userRepository.save(adminUser);
+        registeredUserRepository.save(adminUser);
     }
 }
