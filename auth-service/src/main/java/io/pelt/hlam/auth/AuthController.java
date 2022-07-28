@@ -5,6 +5,7 @@ import io.pelt.hlam.auth.exceptions.UserNotFoundException;
 import io.pelt.hlam.auth.exceptions.WrongPasswordException;
 import io.pelt.hlam.auth.model.RegistrationUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +29,13 @@ public class AuthController {
         try {
             return new ResponseEntity<>(authService.getJWT(username, password), HttpStatus.OK);
         } catch (UserNotFoundException e) {
-            return new ResponseEntity<>("User not found", HttpStatus.UNPROCESSABLE_ENTITY);
+            var headers = new HttpHeaders();
+            headers.add("error-message", "User not found");
+            return new ResponseEntity<>(headers, HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (WrongPasswordException e) {
-            return new ResponseEntity<>("Wrong password", HttpStatus.UNPROCESSABLE_ENTITY);
+            var headers = new HttpHeaders();
+            headers.add("error-message", "Wrong password");
+            return new ResponseEntity<>(headers, HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
     }
