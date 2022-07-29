@@ -4,7 +4,6 @@ plugins {
     id("org.asciidoctor.jvm.convert") version "3.3.2"
     id("java")
 }
-
 java.sourceCompatibility = JavaVersion.VERSION_11
 version = "0.0.1-SNAPSHOT"
 
@@ -30,7 +29,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.2")
     implementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
-
 }
 
 dependencyManagement {
@@ -52,7 +50,8 @@ tasks {
     }
     asciidoctor {
         inputs.dir(snippetsPath)
-        setOutputDir("/src/docs")
+        sourceDir("/src/docs/asciidocs")
+        setOutputDir("/src/docs/")
         dependsOn(test)
     }
 }

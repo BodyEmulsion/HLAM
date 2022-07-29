@@ -1,0 +1,21 @@
+==== Links
+
+:sourcedir: ./build/generated-snippets
+
+Login endpoint allows you to get a JWT
+
+Correct login request:
+
+include::{sourcedir}/get-jwt_when-normal-user-data_then-returns-jwt-and-status200/http-request.adoc[]
+
+Correct username and password response:
+
+include::{sourcedir}/get-jwt_when-normal-user-data_then-returns-jwt-and-status200/http-response.adoc[]
+
+Username not found response:
+
+include::{sourcedir}/get-jwt_when-user-not-exists_then-status422/http-response.adoc[]
+
+Wrong password response:
+
+include::{sourcedir}/get-jwt_when-wrong-password_then-status422/http-response.adoc[]
