@@ -16,6 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -63,14 +64,27 @@ class AuthControllerTest {
     }
 
     @Test
-    void getPublicKey() {
+    void getPublicKey() throws Exception {
+        mockMvc.perform(get("/get-public-key"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        //TODO: add keyspec validation
     }
 
     @Test
-    void getGuestJWT() {
+    void getGuestJWT() throws Exception {
+        mockMvc.perform(post("/guest-login"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.matchesRegex("^[\\w-]*\\.[\\w-]*\\.[\\w-]*$")));
     }
 
     @Test
-    void register() {
+    void register() throws Exception {
+        mockMvc.perform(post("/register")
+                        .param("email", "email@email.com")
+                        .param("username", "unique-username")
+                        .param("password", "StRoNgPaSsWoRd1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.matchesRegex("^[\\w-]*\\.[\\w-]*\\.[\\w-]*$")));
     }
 }
