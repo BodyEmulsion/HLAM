@@ -1,21 +1,24 @@
-==== Links
+:sourcedir: ../../../../auth-service/build/generated-snippets
+//TODO: Fix this path, it's definitely not normal
 
-:sourcedir: ./build/generated-snippets
+=== Вход
 
-Login endpoint allows you to get a JWT
+Данный запрос необходим для получения JWT-токена, который требуется для выполнения большинства запросов в данном приложении.
 
-Correct login request:
+Правильно сформированный запрос:
 
-include::{sourcedir}/get-jwt_when-normal-user-data_then-returns-jwt-and-status200/http-request.adoc[]
+include::{sourcedir}/get-jwt/http-request.adoc[]
 
-Correct username and password response:
+include::{sourcedir}/get-jwt/request-parameters.adoc[]
+
+Ответ, в случае если пользователь существует в базе данных, и отправленный пароль соответствует паролю пользователя:
 
 include::{sourcedir}/get-jwt_when-normal-user-data_then-returns-jwt-and-status200/http-response.adoc[]
 
-Username not found response:
+Ответ, если пользователя с таким именем не существует:
 
 include::{sourcedir}/get-jwt_when-user-not-exists_then-status422/http-response.adoc[]
 
-Wrong password response:
+Ответ, если пользоваетль найден, но пароль не подходит:
 
 include::{sourcedir}/get-jwt_when-wrong-password_then-status422/http-response.adoc[]

@@ -1,0 +1,16 @@
+:sourcedir: ../../../../auth-service/build/generated-snippets
+//TODO: Fix this path, it's definitely not normal
+
+=== Регистрация
+
+Данный запрос позволяет зарегистрироваться, и получить JWT-токен созданного пользователя.
+
+Правильно сформированный запрос:
+
+include::{sourcedir}/register/http-request.adoc[]
+
+include::{sourcedir}/register/request-parameters.adoc[]
+
+Ответ, если все данные введены корректно, а так же пользователя с таким именем или почтой не существует в системе.
+
+include::{sourcedir}/register/http-response.adoc[]

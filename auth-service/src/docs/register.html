@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Вход</title>
+<title>Регистрация</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -441,43 +441,31 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect2">
-<h3 id="_вход">Вход</h3>
+<h3 id="_регистрация">Регистрация</h3>
 <div class="paragraph">
-<p>Данный запрос необходим для получения JWT-токена, который требуется для выполнения большинства запросов в данном приложении.</p>
+<p>Данный запрос позволяет зарегистрироваться, и получить JWT-токен созданного пользователя.</p>
 </div>
 <div class="paragraph">
 <p>Правильно сформированный запрос:</p>
 </div>
 <div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt/http-request.adoc[]</p>
+<p>Unresolved directive in register.adoc - include::../../../../auth-service/build/generated-snippets/register/http-request.adoc[]</p>
 </div>
 <div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt/request-parameters.adoc[]</p>
+<p>Unresolved directive in register.adoc - include::../../../../auth-service/build/generated-snippets/register/request-parameters.adoc[]</p>
 </div>
 <div class="paragraph">
-<p>Ответ, в случае если пользователь существует в базе данных, и отправленный пароль соответствует паролю пользователя:</p>
+<p>Ответ, если все данные введены корректно, а так же пользователя с таким именем или почтой не существует в системе.</p>
 </div>
 <div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt_when-normal-user-data_then-returns-jwt-and-status200/http-response.adoc[]</p>
-</div>
-<div class="paragraph">
-<p>Ответ, если пользователя с таким именем не существует:</p>
-</div>
-<div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt_when-user-not-exists_then-status422/http-response.adoc[]</p>
-</div>
-<div class="paragraph">
-<p>Ответ, если пользоваетль найден, но пароль не подходит:</p>
-</div>
-<div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt_when-wrong-password_then-status422/http-response.adoc[]</p>
+<p>Unresolved directive in register.adoc - include::../../../../auth-service/build/generated-snippets/register/http-response.adoc[]</p>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-08-02 17:08:36 +0300
+Last updated 2022-08-02 17:06:40 +0300
 </div>
 </div>
 </body>

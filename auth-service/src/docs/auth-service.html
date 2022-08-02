@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Вход</title>
+<title>Сервис авторизации</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -440,6 +440,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 </div>
 <div id="content">
+<div class="sect1">
+<h2 id="_сервис_авторизации">Сервис авторизации</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Данный сервис обрабатывает опросы связанные с авторизацией, регистрацией, и созданием JWT-токенов.</p>
+</div>
 <div class="sect2">
 <h3 id="_вход">Вход</h3>
 <div class="paragraph">
@@ -448,36 +454,131 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>Правильно сформированный запрос:</p>
 </div>
-<div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt/http-request.adoc[]</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /login HTTP/1.1
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&amp;password=password</code></pre>
 </div>
-<div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt/request-parameters.adoc[]</p>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Имя пользователя. Пользователь с таким именем должеж существовать в базе данных</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Пароль. Пароль должен соответствовать паролю пользователя</p></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
 <p>Ответ, в случае если пользователь существует в базе данных, и отправленный пароль соответствует паролю пользователя:</p>
 </div>
-<div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt_when-normal-user-data_then-returns-jwt-and-status200/http-response.adoc[]</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 532
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJwcml2aWxlZ2VzIjpbIm1pcnJvciIsImFjdHVhdG9yIiwicHVibGljLWtleSJdLCJyb2xlcyI6WyIxOmFkbWluIl0sImlkIjoiMSIsImV4cCI6MTY2MjA0MTM1NywidXNlcm5hbWUiOiJhZG1pbiJ9.cL-J0u3vtnp2FP3Pcb9GSlNFz_M9TmKXJVQS5tXucPDkQDRWUKxd77nL8TKHxaUc355ska8Ca8_DT0ejZZdS2LXRsG66cYgZbm-aIUCm626N3PWs527DfRcSbOPxV26QYse-j8dIcMbl5X0aI7MF931MG3uKYEKmKrwrKfJd8ggBEOzpHic4s5vyOzP3ZKmec5zxgfZKlNvE9WMApJg_OSqWbctkV-HShHZ1SBZy2Hv-uiVxVlpr_QZOiLB1B2y2kUFpGxcoppkKFs1hPCq8simCdJ5Fx7ztX9n81Vch750Rv6enqOsc_rMqXD9Y6nadK_j05EVx_-Y1sZjGTvapbA</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Ответ, если пользователя с таким именем не существует:</p>
 </div>
-<div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt_when-user-not-exists_then-status422/http-response.adoc[]</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 422 Unprocessable Entity
+error-message: User not found</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Ответ, если пользоваетль найден, но пароль не подходит:</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 422 Unprocessable Entity
+error-message: Wrong password</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_регистрация">Регистрация</h3>
 <div class="paragraph">
-<p>Unresolved directive in login.adoc - include::../../../../auth-service/build/generated-snippets/get-jwt_when-wrong-password_then-status422/http-response.adoc[]</p>
+<p>Данный запрос позволяет зарегистрироваться, и получить JWT-токен созданного пользователя.</p>
+</div>
+<div class="paragraph">
+<p>Правильно сформированный запрос:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /register HTTP/1.1
+Host: localhost:8080
+Content-Type: application/x-www-form-urlencoded
+
+email=email%40email.com&amp;username=unique-username&amp;password=StRoNgPaSsWoRd1</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Имя пользователя должно быть уникальным</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Пароль должен состоять из 8 и более символов, содержать заглавные и строчные буквы, а так же как минимум 1 цифру</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Адрес электронной почты, на которую придет сообщение для активации аккаунта</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Ответ, если все данные введены корректно, а так же пользователя с таким именем или почтой не существует в системе.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 512
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJwcml2aWxlZ2VzIjpbIm1pcnJvciJdLCJyb2xlcyI6WyIzOnVzZXIiXSwiaWQiOiIyIiwiZXhwIjoxNjYyMDQxMzU3LCJ1c2VybmFtZSI6InVuaXF1ZS11c2VybmFtZSJ9.caJRXMaYbWPdmjkODCAH7JmpxSfHbIgZvMazpcq_9aeal21Ec0KRuwJ1J3XdpsiPVhwRxkOmH9dFjDiNSAbFhlJJouSsuKk3q-nqatGN4TMOpx2hu9zVyFX6KZQ2Pno1mHV9u-m971yu-0OZl9SMB8JRj4WDg7lcU2Ac4e-eMwohEjcwZNi0xMryfZpPmdis6CwWg4FPBjKsLqAEonRFDbBRGrAT6L1vXJXDgK8PuB0kJ1AxyzDoPD7mi_OsphFqarrysPOpGvU5fHdjvYTI1GgjNeBJbcs29EwNcsGmjPewDUx2Bv8uEoAIIaERVqr5bd7aQmS9X8iZSJcDv5Karg</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2022-08-02 17:08:36 +0300
+Last updated 2022-08-02 17:08:31 +0300
 </div>
 </div>
 </body>

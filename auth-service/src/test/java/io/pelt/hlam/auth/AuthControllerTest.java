@@ -16,6 +16,8 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,7 +44,10 @@ class AuthControllerTest {
                         .param("username", "admin")
                         .param("password", "password"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(Matchers.matchesRegex("^[\\w-]*\\.[\\w-]*\\.[\\w-]*$")));
+                .andExpect(content().string(Matchers.matchesRegex("^[\\w-]*\\.[\\w-]*\\.[\\w-]*$")))
+                .andDo(document("get-jwt", requestParameters(
+                        parameterWithName("username").description("Имя пользователя. Пользователь с таким именем должеж существовать в базе данных"),
+                        parameterWithName("password").description("Пароль. Пароль должен соответствовать паролю пользователя"))));
     }
 
     @Test
@@ -85,6 +90,13 @@ class AuthControllerTest {
                         .param("username", "unique-username")
                         .param("password", "StRoNgPaSsWoRd1"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(Matchers.matchesRegex("^[\\w-]*\\.[\\w-]*\\.[\\w-]*$")));
+                .andExpect(content().string(Matchers.matchesRegex("^[\\w-]*\\.[\\w-]*\\.[\\w-]*$")))
+                .andDo(document("register", requestParameters(
+                        parameterWithName("username").description("Имя пользователя должно быть уникальным"),
+                        parameterWithName("password").description("Пароль должен состоять из 8 и более символов, " +
+                                "содержать заглавные и строчные буквы, а так же как минимум 1 цифру"),
+                        parameterWithName("email").description("Адрес электронной почты, на которую придет " +
+                                "сообщение для активации аккаунта")
+                )));
     }
 }

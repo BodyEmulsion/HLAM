@@ -1,0 +1,9 @@
+:asciidocs: src/docs/asciidocs
+
+== Сервис авторизации
+
+Данный сервис обрабатывает опросы связанные с авторизацией, регистрацией, и созданием JWT-токенов.
+
+include::{asciidocs}/login.adoc[]
+
+include::{asciidocs}/register.adoc[]
