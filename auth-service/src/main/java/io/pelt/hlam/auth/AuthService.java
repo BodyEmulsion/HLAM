@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.RSAPublicKeySpec;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +60,8 @@ public class AuthService {
         return generateJWT(user.get());
     }
 
-    public RSAPublicKeySpec getPublicKey() {
-        return new RSAPublicKeySpec(publicKey.getModulus(), publicKey.getPublicExponent());
+    public PublicKey getPublicKey() {
+        return publicKey;
     }
 
     private String generateJWT(User user) {

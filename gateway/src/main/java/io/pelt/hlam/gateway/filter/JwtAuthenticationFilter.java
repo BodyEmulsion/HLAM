@@ -14,19 +14,18 @@ import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
-import java.util.Map;
+import java.security.spec.X509EncodedKeySpec;
 
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
@@ -36,7 +35,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
     private AuthService authService;
 
     private JWTVerifier verifier;
-    private Mono<Map<String, BigInteger>> publicKeyRequest;
+    private Mono<ResponseEntity<byte[]>> publicKeyRequest;
 
     JwtAuthenticationFilter() {
         super();
@@ -59,7 +58,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
         this.publicKeyRequest.subscribe(
                 rsaPublicKeySpec -> {
                     try {
-                        this.verifier = getJwtVerifier(rsaPublicKeySpec);
+                        this.verifier = getJwtVerifier(rsaPublicKeySpec.getBody());
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                         logger.error(e.getMessage());
                         //TODO: do something with this.
@@ -72,13 +71,11 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory {
                 });
     }
 
-    private JWTVerifier getJwtVerifier(Map<String, BigInteger> rsaPublicKeySpec)
+    private JWTVerifier getJwtVerifier(byte[] encodedRSAPublicKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
-        var publicKeySpec = new RSAPublicKeySpec(
-                rsaPublicKeySpec.get("modulus"),
-                rsaPublicKeySpec.get("exp"));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
+        RSAPublicKey publicKey = (RSAPublicKey) KeyFactory
+                .getInstance("RSA")
+                .generatePublic(new X509EncodedKeySpec(encodedRSAPublicKey));
         var algorithm = Algorithm.RSA512(publicKey, null);
         return JWT.require(algorithm).build();
     }

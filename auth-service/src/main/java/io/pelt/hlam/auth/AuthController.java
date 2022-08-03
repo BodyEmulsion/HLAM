@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.math.BigInteger;
-import java.util.Map;
 
 
 @RestController()
@@ -40,13 +38,9 @@ public class AuthController {
     }
 
     @GetMapping(path = "get-public-key")
-    public Map<String, BigInteger> getPublicKey(){
-        try {
-            var spec = this.authService.getPublicKey();
-            return Map.of("modulus", spec.getModulus(), "exp", spec.getPublicExponent());
-        } catch (Exception e) {
-           return Map.of();
-        }
+    public ResponseEntity<byte[]> getPublicKey(){
+        var spec = this.authService.getPublicKey().getEncoded();
+        return new ResponseEntity<>(spec, HttpStatus.OK);
     }
 
     @PostMapping(path = "guest-login")
