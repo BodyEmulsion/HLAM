@@ -50,7 +50,8 @@ tasks {
     }
     asciidoctor {
         inputs.dir(snippetsPath)
-        sourceDir("/src/docs/asciidocs")
+        setSourceDir("/src/docs/asciidocs")
+        sources("auth-service.adoc")
         setOutputDir("/src/docs/")
         dependsOn(test)
     }

@@ -1,0 +1,14 @@
+:sourcedir: ../../../../auth-service/build/generated-snippets
+//TODO: Fix this path, it's definitely not normal
+
+=== Получение гостевого JWT-токена
+
+Данный запрос выполняется для получения гостевого JWT-токена. Токен необходим для идентификации и сохранения данных о совершенных гостем действиях, на случай если он решит зарегистрироваться.
+
+Правильно сформированный запрос:
+
+include::{sourcedir}/get-guest-jwt/http-request.adoc[]
+
+Ответ:
+
+include::{sourcedir}/get-guest-jwt/http-response.adoc[]

@@ -1,0 +1,14 @@
+:sourcedir: ../../../../auth-service/build/generated-snippets
+//TODO: Fix this path, it's definitely not normal
+
+=== Получение публичного ключа
+
+Данный запрос позволяет получить публичный ключ для верификации JWT-токена, используется другими микросервисами, и недоступен для пользоваетлей.
+
+Правильно сформированный запрос:
+
+include::{sourcedir}/get-public-key/http-request.adoc[]
+
+Ответ содержит закодированный ключа (byte[]):
+
+include::{sourcedir}/get-public-key/http-response.adoc[]

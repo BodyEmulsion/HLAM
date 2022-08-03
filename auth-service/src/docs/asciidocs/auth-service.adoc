@@ -7,3 +7,7 @@
 include::{asciidocs}/login.adoc[]
 
 include::{asciidocs}/register.adoc[]
+
+include::{asciidocs}/get-guest-jwt.adoc[]
+
+include::{asciidocs}/get-public-key.adoc[]
