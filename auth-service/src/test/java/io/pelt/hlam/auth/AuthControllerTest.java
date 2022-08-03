@@ -13,6 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.security.KeyFactory;
+import java.security.spec.X509EncodedKeySpec;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -72,8 +75,12 @@ class AuthControllerTest {
     void getPublicKey() throws Exception {
         mockMvc.perform(get("/get-public-key"))
                 .andExpect(status().isOk())
-                .andReturn().getResponse();
-        //TODO: add keyspec validation
+                .andExpect(result -> {
+                    var encodedPublicKey = result.getResponse().getContentAsByteArray();
+                    var publicKey = KeyFactory.getInstance("RSA")
+                            .generatePublic(new X509EncodedKeySpec(encodedPublicKey));
+                    //TODO: need more key tests here maybe...
+                });
     }
 
     @Test
